@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -128,7 +128,7 @@ export const StartupQuestionnaire = () => {
 
     const scoreRange = Object.values(scoringRanges).find(
       range => totalScore >= range.min && totalScore <= range.max
-    );
+    ) || scoringRanges.bad; // Fallback para o range mais baixo se nenhum for encontrado
 
     const resultsData = {
       totalScore: Math.round(totalScore * 10) / 10,
@@ -235,7 +235,7 @@ export const StartupQuestionnaire = () => {
 
       {/* Questions */}
       <div className="space-y-6">
-        {currentCategory.questions.map((question, index) => (
+        {currentCategory.questions.map((question) => (
           <QuestionCard
             key={question.id}
             question={question}

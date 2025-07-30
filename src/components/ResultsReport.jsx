@@ -46,7 +46,7 @@ export const ResultsReport = ({ results, onRestart }) => {
   const getRecommendations = () => {
     const recommendations = [];
     
-    Object.entries(results.categoryScores).forEach(([categoryId, categoryData]) => {
+    Object.entries(results.categoryScores).forEach(([, categoryData]) => {
       if (categoryData.average < 3) {
         recommendations.push({
           category: categoryData.title,
@@ -150,10 +150,10 @@ export const ResultsReport = ({ results, onRestart }) => {
                   Pontuação Final: {results.totalScore}/100
                 </h2>
                 <p className="text-lg font-medium mb-1">
-                  {results.scoreRange.label}
+                  {results.scoreRange?.label || 'Score não classificado'}
                 </p>
                 <p className="text-sm opacity-80">
-                  {results.scoreRange.description}
+                  {results.scoreRange?.description || 'Descrição não disponível'}
                 </p>
               </div>
               <div className="text-right">

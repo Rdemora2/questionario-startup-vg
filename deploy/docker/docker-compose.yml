@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  questionario-startup:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    container_name: questionario-startup
+    environment:
+      - NODE_ENV=production
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.questionario.rule=Host(`localhost`)"
+      - "traefik.http.services.questionario.loadbalancer.server.port=80"
+
+networks:
+  default:
+    name: questionario-network
+

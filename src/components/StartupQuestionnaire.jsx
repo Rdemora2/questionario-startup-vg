@@ -1,13 +1,19 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { QuestionCard } from './QuestionComponents';
-import { ResultsReport } from './ResultsReport';
-import { questionnaireData, scoringRanges } from '../data/questions';
-import { ChevronLeft, ChevronRight, CheckCircle, AlertCircle, BarChart3 } from 'lucide-react';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { QuestionCard } from "./QuestionComponents";
+import { ResultsReport } from "./ResultsReport";
+import { questionnaireData, scoringRanges } from "../data/questions";
+import {
+  ChevronLeft,
+  ChevronRight,
+  CheckCircle,
+  AlertCircle,
+  BarChart3,
+} from "lucide-react";
 
 export const StartupQuestionnaire = () => {
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
@@ -18,19 +24,22 @@ export const StartupQuestionnaire = () => {
 
   const categories = questionnaireData.categories;
   const currentCategory = categories[currentCategoryIndex];
-  const totalQuestions = categories.reduce((sum, cat) => sum + cat.questions.length, 0);
+  const totalQuestions = categories.reduce(
+    (sum, cat) => sum + cat.questions.length,
+    0
+  );
   const answeredQuestions = Object.keys(answers).length;
   const progress = (answeredQuestions / totalQuestions) * 100;
 
   const handleAnswerChange = (questionId, value) => {
-    setAnswers(prev => ({
+    setAnswers((prev) => ({
       ...prev,
-      [questionId]: value
+      [questionId]: value,
     }));
-    
+
     // Clear error for this question
     if (errors[questionId]) {
-      setErrors(prev => {
+      setErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors[questionId];
         return newErrors;
@@ -43,9 +52,9 @@ export const StartupQuestionnaire = () => {
     const newErrors = {};
     let isValid = true;
 
-    category.questions.forEach(question => {
+    category.questions.forEach((question) => {
       if (question.required && !answers[question.id]) {
-        newErrors[question.id] = 'Esta pergunta é obrigatória';
+        newErrors[question.id] = "Esta pergunta é obrigatória";
         isValid = false;
       }
     });
@@ -57,7 +66,7 @@ export const StartupQuestionnaire = () => {
   const handleNext = () => {
     if (validateCategory(currentCategoryIndex)) {
       if (currentCategoryIndex < categories.length - 1) {
-        setCurrentCategoryIndex(prev => prev + 1);
+        setCurrentCategoryIndex((prev) => prev + 1);
       } else {
         calculateResults();
       }
@@ -66,7 +75,7 @@ export const StartupQuestionnaire = () => {
 
   const handlePrevious = () => {
     if (currentCategoryIndex > 0) {
-      setCurrentCategoryIndex(prev => prev - 1);
+      setCurrentCategoryIndex((prev) => prev - 1);
     }
   };
 
@@ -74,17 +83,17 @@ export const StartupQuestionnaire = () => {
     if (!answer) return 0;
 
     if (question.options) {
-      const option = question.options.find(opt => opt.value === answer);
+      const option = question.options.find((opt) => opt.value === answer);
       return option ? option.score : 0;
     }
 
     // For text/textarea questions, we'll need manual scoring
     // For now, return a default score of 3 (satisfactory)
-    if (question.type === 'textarea' || question.type === 'text') {
+    if (question.type === "textarea" || question.type === "text") {
       return 3; // This should be manually scored in a real implementation
     }
 
-    if (question.type === 'boolean_with_details') {
+    if (question.type === "boolean_with_details") {
       return answer.answer ? 3 : 1; // Basic scoring for boolean questions
     }
 
@@ -95,40 +104,42 @@ export const StartupQuestionnaire = () => {
     const categoryScores = {};
     let totalScore = 0;
 
-    categories.forEach(category => {
+    categories.forEach((category) => {
       let categoryTotal = 0;
       let questionCount = 0;
 
-      category.questions.forEach(question => {
+      category.questions.forEach((question) => {
         const answer = answers[question.id];
         const score = calculateQuestionScore(question, answer);
         categoryTotal += score;
         questionCount++;
       });
 
-      const categoryAverage = questionCount > 0 ? categoryTotal / questionCount : 0;
+      const categoryAverage =
+        questionCount > 0 ? categoryTotal / questionCount : 0;
       const weightedScore = categoryAverage * category.weight * 100;
-      
+
       categoryScores[category.id] = {
         title: category.title,
         average: categoryAverage,
         weightedScore: weightedScore,
         weight: category.weight,
         maxScore: 5,
-        questions: category.questions.map(q => ({
+        questions: category.questions.map((q) => ({
           id: q.id,
           question: q.question,
           answer: answers[q.id],
-          score: calculateQuestionScore(q, answers[q.id])
-        }))
+          score: calculateQuestionScore(q, answers[q.id]),
+        })),
       };
 
       totalScore += weightedScore;
     });
 
-    const scoreRange = Object.values(scoringRanges).find(
-      range => totalScore >= range.min && totalScore <= range.max
-    ) || scoringRanges.bad; // Fallback para o range mais baixo se nenhum for encontrado
+    const scoreRange =
+      Object.values(scoringRanges).find(
+        (range) => totalScore >= range.min && totalScore <= range.max
+      ) || scoringRanges.bad;
 
     const resultsData = {
       totalScore: Math.round(totalScore * 10) / 10,
@@ -136,7 +147,7 @@ export const StartupQuestionnaire = () => {
       scoreRange,
       answeredQuestions,
       totalQuestions,
-      completionDate: new Date().toISOString()
+      completionDate: new Date().toISOString(),
     };
 
     setResults(resultsData);
@@ -145,12 +156,14 @@ export const StartupQuestionnaire = () => {
 
   const getCategoryStatus = (categoryIndex) => {
     const category = categories[categoryIndex];
-    const answeredInCategory = category.questions.filter(q => answers[q.id]).length;
+    const answeredInCategory = category.questions.filter(
+      (q) => answers[q.id]
+    ).length;
     const totalInCategory = category.questions.length;
-    
-    if (answeredInCategory === totalInCategory) return 'completed';
-    if (answeredInCategory > 0) return 'partial';
-    return 'pending';
+
+    if (answeredInCategory === totalInCategory) return "completed";
+    if (answeredInCategory > 0) return "partial";
+    return "pending";
   };
 
   const resetQuestionnaire = () => {
@@ -173,15 +186,18 @@ export const StartupQuestionnaire = () => {
           Questionário de Avaliação de Startups
         </h1>
         <p className="text-gray-600 mb-4">
-          Avalie o potencial da sua startup em múltiplas dimensões para identificar viabilidade, 
-          escalabilidade e necessidades de investimento.
+          Avalie o potencial da sua startup em múltiplas dimensões para
+          identificar viabilidade, escalabilidade e necessidades de
+          investimento.
         </p>
-        
+
         {/* Progress */}
         <div className="space-y-2">
           <div className="flex justify-between text-sm text-gray-600">
             <span>Progresso Geral</span>
-            <span>{answeredQuestions} de {totalQuestions} perguntas</span>
+            <span>
+              {answeredQuestions} de {totalQuestions} perguntas
+            </span>
           </div>
           <Progress value={progress} className="h-2" />
         </div>
@@ -193,21 +209,23 @@ export const StartupQuestionnaire = () => {
           {categories.map((category, index) => {
             const status = getCategoryStatus(index);
             const isActive = index === currentCategoryIndex;
-            
+
             return (
               <Button
                 key={category.id}
-                variant={isActive ? 'default' : 'outline'}
+                variant={isActive ? "default" : "outline"}
                 size="sm"
                 onClick={() => setCurrentCategoryIndex(index)}
                 className={`flex items-center gap-2 ${
-                  status === 'completed' ? 'bg-green-50 border-green-200 text-green-700' :
-                  status === 'partial' ? 'bg-yellow-50 border-yellow-200 text-yellow-700' :
-                  'bg-gray-50 border-gray-200 text-gray-700'
+                  status === "completed"
+                    ? "bg-green-50 border-green-200 text-green-700"
+                    : status === "partial"
+                    ? "bg-yellow-50 border-yellow-200 text-yellow-700"
+                    : "bg-gray-50 border-gray-200 text-gray-700"
                 }`}
               >
-                {status === 'completed' && <CheckCircle className="h-4 w-4" />}
-                {status === 'partial' && <AlertCircle className="h-4 w-4" />}
+                {status === "completed" && <CheckCircle className="h-4 w-4" />}
+                {status === "partial" && <AlertCircle className="h-4 w-4" />}
                 <span className="hidden sm:inline">{category.title}</span>
                 <span className="sm:hidden">Cat. {index + 1}</span>
               </Button>
@@ -224,7 +242,9 @@ export const StartupQuestionnaire = () => {
               <CardTitle className="text-xl text-gray-900">
                 {currentCategory.title}
               </CardTitle>
-              <p className="text-gray-600 mt-1">{currentCategory.description}</p>
+              <p className="text-gray-600 mt-1">
+                {currentCategory.description}
+              </p>
             </div>
             <Badge variant="outline" className="text-sm">
               Peso: {(currentCategory.weight * 100).toFixed(0)}%
@@ -263,10 +283,7 @@ export const StartupQuestionnaire = () => {
           Categoria {currentCategoryIndex + 1} de {categories.length}
         </div>
 
-        <Button
-          onClick={handleNext}
-          className="flex items-center gap-2"
-        >
+        <Button onClick={handleNext} className="flex items-center gap-2">
           {currentCategoryIndex === categories.length - 1 ? (
             <>
               <BarChart3 className="h-4 w-4" />
@@ -283,4 +300,3 @@ export const StartupQuestionnaire = () => {
     </div>
   );
 };
-

@@ -117,7 +117,10 @@ export const StartupQuestionnaire = () => {
 
       const categoryAverage =
         questionCount > 0 ? categoryTotal / questionCount : 0;
-      const weightedScore = categoryAverage * category.weight * 100;
+
+      const normalizedAverage = categoryAverage / 5;
+
+      const weightedScore = normalizedAverage * category.weight * 100;
 
       categoryScores[category.id] = {
         title: category.title,

@@ -87,17 +87,199 @@ export const StartupQuestionnaire = () => {
       return option ? option.score : 0;
     }
 
-    // For text/textarea questions, we'll need manual scoring
-    // For now, return a default score of 3 (satisfactory)
-    if (question.type === "textarea" || question.type === "text") {
-      return 3; // This should be manually scored in a real implementation
+    if (question.type === "number" || question.type === "currency") {
+      return calculateNumericScore(question, answer);
+    }
+
+    if (question.type === "percentage") {
+      return calculatePercentageScore(question, answer);
     }
 
     if (question.type === "boolean_with_details") {
-      return answer.answer ? 3 : 1; // Basic scoring for boolean questions
+      return answer.answer ? 3 : 1;
     }
 
-    return 3; // Default score
+    if (question.type === "textarea" || question.type === "text") {
+      return calculateTextScore(question, answer);
+    }
+
+    return 3;
+  };
+
+  const calculateNumericScore = (question, value) => {
+    const numValue = parseFloat(value) || 0;
+
+    switch (question.id) {
+      case "p6_1":
+        if (numValue >= 100000) return 5;
+        if (numValue >= 10000) return 4;
+        if (numValue >= 1000) return 3;
+        if (numValue >= 100) return 2;
+        return 1;
+
+      case "p6_3":
+        if (numValue >= 1000) return 5;
+        if (numValue >= 100) return 4;
+        if (numValue >= 10) return 3;
+        if (numValue >= 1) return 2;
+        return 1;
+
+      case "p6_4":
+        if (numValue >= 100000) return 5;
+        if (numValue >= 20000) return 4;
+        if (numValue >= 5000) return 3;
+        if (numValue >= 1000) return 2;
+        return 1;
+
+      case "p6_6":
+        if (numValue <= 500) return 5;
+        if (numValue <= 1000) return 4;
+        if (numValue <= 2000) return 3;
+        if (numValue <= 5000) return 2;
+        return 1;
+
+      case "p5_2":
+        if (numValue >= 1000) return 5;
+        if (numValue >= 300) return 4;
+        if (numValue >= 100) return 3;
+        if (numValue >= 30) return 2;
+        return 1;
+
+      case "p5_4":
+        if (numValue <= 20000) return 5;
+        if (numValue <= 50000) return 4;
+        if (numValue <= 100000) return 3;
+        if (numValue <= 200000) return 2;
+        return 1;
+
+      case "p5_5":
+        if (numValue >= 18) return 5;
+        if (numValue >= 12) return 4;
+        if (numValue >= 6) return 3;
+        if (numValue >= 3) return 2;
+        return 1;
+
+      case "p7_3":
+        if (numValue <= 2000000) return 5;
+        if (numValue <= 5000000) return 4;
+        if (numValue <= 10000000) return 3;
+        if (numValue <= 20000000) return 2;
+        return 1;
+
+      default:
+        return 3;
+    }
+  };
+
+  const calculatePercentageScore = (question, value) => {
+    const numValue = parseFloat(value) || 0;
+
+    switch (question.id) {
+      case "p6_2":
+        if (numValue >= 20) return 5;
+        if (numValue >= 10) return 4;
+        if (numValue >= 5) return 3;
+        if (numValue > 0) return 2;
+        return 1;
+
+      case "p6_5":
+        if (numValue <= 2) return 5;
+        if (numValue <= 5) return 4;
+        if (numValue <= 10) return 3;
+        if (numValue <= 20) return 2;
+        return 1;
+
+      case "p5_3":
+        if (numValue >= 80) return 5;
+        if (numValue >= 60) return 4;
+        if (numValue >= 40) return 3;
+        if (numValue >= 20) return 2;
+        return 1;
+
+      default:
+        return 3;
+    }
+  };
+
+  const calculateTextScore = (question, text) => {
+    if (!text || text.length < 10) return 1;
+
+    const lowercaseText = text.toLowerCase();
+    let score = 3;
+
+    switch (question.id) {
+      case "p1_1": {
+        const problemKeywords = [
+          "específico",
+          "mensurado",
+          "quantificado",
+          "pesquisa",
+          "validado",
+        ];
+        if (problemKeywords.some((word) => lowercaseText.includes(word)))
+          score += 1;
+        if (text.length > 100) score += 1;
+        break;
+      }
+
+      case "p1_4": {
+        const altKeywords = [
+          "concorrentes",
+          "limitações",
+          "gargalos",
+          "ineficiências",
+        ];
+        if (altKeywords.some((word) => lowercaseText.includes(word)))
+          score += 1;
+        break;
+      }
+
+      case "p1_5": {
+        const uvpKeywords = ["único", "exclusivo", "diferencial", "inovação"];
+        if (uvpKeywords.some((word) => lowercaseText.includes(word)))
+          score += 1;
+        break;
+      }
+
+      case "p1_6": {
+        const diffKeywords = [
+          "patenteado",
+          "proprietário",
+          "exclusivo",
+          "barreira",
+        ];
+        if (diffKeywords.some((word) => lowercaseText.includes(word)))
+          score += 1;
+        break;
+      }
+
+      case "p1_8": {
+        const solKeywords = [
+          "arquitetura",
+          "algoritmo",
+          "tecnologia",
+          "implementação",
+        ];
+        if (solKeywords.some((word) => lowercaseText.includes(word)))
+          score += 1;
+        break;
+      }
+
+      case "p2_5": {
+        const personaKeywords = [
+          "idade",
+          "renda",
+          "comportamento",
+          "necessidades",
+          "dores",
+        ];
+        if (personaKeywords.some((word) => lowercaseText.includes(word)))
+          score += 1;
+        break;
+      }
+    }
+
+    return Math.min(Math.max(score, 1), 5);
   };
 
   const calculateResults = () => {
@@ -150,6 +332,7 @@ export const StartupQuestionnaire = () => {
       scoreRange,
       answeredQuestions,
       totalQuestions,
+      answers,
       completionDate: new Date().toISOString(),
     };
 

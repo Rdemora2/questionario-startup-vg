@@ -3,21 +3,21 @@ export const questionnaireData = {
     {
       id: 'validation',
       title: 'Validação da Ideia e Problema',
-      weight: 0.20,
+      weight: 0.18,
       description: 'Avaliação da validação do problema, proposta de valor e solução proposta',
       questions: [
         {
           id: 'p1_1',
-          type: 'textarea',
-          question: 'Descreva o problema principal que sua startup resolve.',
+          type: 'select',
+          question: 'Qual o nível de definição do problema que sua startup resolve?',
           required: true,
-          scoring: {
-            5: 'Problema específico, bem definido, com impacto claro',
-            4: 'Problema claro com alguma especificidade',
-            3: 'Problema identificado mas genérico',
-            2: 'Problema vago ou mal definido',
-            1: 'Problema inexistente ou incompreensível'
-          }
+          options: [
+            { value: 5, label: 'Problema específico, bem definido, com impacto quantificado', score: 5 },
+            { value: 4, label: 'Problema claro com boa especificidade', score: 4 },
+            { value: 3, label: 'Problema identificado mas genérico', score: 3 },
+            { value: 2, label: 'Problema vago ou mal definido', score: 2 },
+            { value: 1, label: 'Problema inexistente ou incompreensível', score: 1 }
+          ]
         },
         {
           id: 'p1_2',
@@ -47,43 +47,42 @@ export const questionnaireData = {
         },
         {
           id: 'p1_4',
-          type: 'textarea',
-          question: 'Como seu público-alvo resolve este problema atualmente?',
+          type: 'select',
+          question: 'Qual seu nível de conhecimento sobre como o problema é resolvido atualmente?',
           required: true,
-          scoring: {
-            5: 'Conhecimento profundo das alternativas e suas limitações',
-            4: 'Bom conhecimento das alternativas',
-            3: 'Conhecimento básico das alternativas',
-            2: 'Conhecimento superficial',
-            1: 'Desconhece alternativas'
-          }
+          options: [
+            { value: 5, label: 'Conhecimento profundo das alternativas e suas limitações', score: 5 },
+            { value: 4, label: 'Bom conhecimento das alternativas existentes', score: 4 },
+            { value: 3, label: 'Conhecimento básico das alternativas', score: 3 },
+            { value: 2, label: 'Conhecimento superficial do mercado', score: 2 },
+            { value: 1, label: 'Desconhece as alternativas existentes', score: 1 }
+          ]
         },
         {
           id: 'p1_5',
-          type: 'text',
-          question: 'Qual é sua proposta de valor única em uma frase? (máx. 100 caracteres)',
+          type: 'select',
+          question: 'Qual a clareza da sua proposta de valor única?',
           required: true,
-          maxLength: 100,
-          scoring: {
-            5: 'UVP clara, concisa e diferenciada',
-            4: 'UVP clara com boa diferenciação',
-            3: 'UVP identificável mas genérica',
-            2: 'UVP confusa ou pouco diferenciada',
-            1: 'UVP inexistente ou incompreensível'
-          }
+          options: [
+            { value: 5, label: 'UVP clara, concisa e altamente diferenciada', score: 5 },
+            { value: 4, label: 'UVP clara com boa diferenciação', score: 4 },
+            { value: 3, label: 'UVP identificável mas genérica', score: 3 },
+            { value: 2, label: 'UVP confusa ou pouco diferenciada', score: 2 },
+            { value: 1, label: 'UVP inexistente ou incompreensível', score: 1 }
+          ]
         },
         {
           id: 'p1_6',
-          type: 'textarea',
-          question: 'Por que um cliente escolheria sua solução ao invés das alternativas existentes?',
+          type: 'select',
+          question: 'Qual o nível de diferenciação da sua solução vs. concorrentes?',
           required: true,
-          scoring: {
-            5: 'Diferenciação clara e sustentável',
-            4: 'Diferenciação identificável',
-            3: 'Alguma diferenciação',
-            2: 'Diferenciação mínima',
-            1: 'Sem diferenciação'
-          }
+          options: [
+            { value: 5, label: 'Diferenciação clara e defensável (moat)', score: 5 },
+            { value: 4, label: 'Diferenciação identificável e relevante', score: 4 },
+            { value: 3, label: 'Alguma diferenciação percebida', score: 3 },
+            { value: 2, label: 'Diferenciação mínima ou temporária', score: 2 },
+            { value: 1, label: 'Sem diferenciação significativa', score: 1 }
+          ]
         },
         {
           id: 'p1_7',
@@ -100,30 +99,29 @@ export const questionnaireData = {
         },
         {
           id: 'p1_8',
-          type: 'textarea',
-          question: 'Descreva sua solução em detalhes.',
+          type: 'select',
+          question: 'Qual o nível de detalhamento técnico da sua solução?',
           required: true,
-          scoring: {
-            5: 'Solução detalhada, técnica e viável',
-            4: 'Solução clara e viável',
-            3: 'Solução básica mas compreensível',
-            2: 'Solução vaga',
-            1: 'Solução inexistente ou inviável'
-          }
+          options: [
+            { value: 5, label: 'Solução detalhada, técnica e comprovadamente viável', score: 5 },
+            { value: 4, label: 'Solução clara e tecnicamente viável', score: 4 },
+            { value: 3, label: 'Solução básica mas compreensível', score: 3 },
+            { value: 2, label: 'Solução vaga ou incompleta', score: 2 },
+            { value: 1, label: 'Solução inexistente ou tecnicamente inviável', score: 1 }
+          ]
         },
         {
           id: 'p1_9',
-          type: 'boolean_with_details',
-          question: 'Sua solução já foi testada com usuários reais?',
+          type: 'select',
+          question: 'Qual o nível de validação com usuários reais?',
           required: true,
-          details: 'Se sim, quantos usuários testaram? Quais foram os resultados?',
-          scoring: {
-            5: 'Sim, mais de 50 usuários com resultados positivos',
-            4: 'Sim, 21-50 usuários com bons resultados',
-            3: 'Sim, 6-20 usuários com resultados mistos',
-            2: 'Sim, 1-5 usuários',
-            1: 'Não testou'
-          }
+          options: [
+            { value: 5, label: 'Mais de 50 usuários testaram com resultados positivos', score: 5 },
+            { value: 4, label: '21-50 usuários testaram com bons resultados', score: 4 },
+            { value: 3, label: '6-20 usuários testaram com resultados mistos', score: 3 },
+            { value: 2, label: '1-5 usuários testaram', score: 2 },
+            { value: 1, label: 'Não foi testado com usuários reais', score: 1 }
+          ]
         },
         {
           id: 'p1_10',
@@ -143,21 +141,21 @@ export const questionnaireData = {
     {
       id: 'market',
       title: 'Mercado e Clientes',
-      weight: 0.18,
+      weight: 0.16,
       description: 'Análise do mercado, segmentação de clientes e análise da concorrência',
       questions: [
         {
           id: 'p2_1',
-          type: 'currency',
+          type: 'select',
           question: 'Qual o tamanho do mercado total (TAM) que você está atacando?',
           required: true,
-          scoring: {
-            5: 'TAM > R$ 10 bilhões, bem fundamentado',
-            4: 'TAM R$ 1-10 bilhões, fundamentado',
-            3: 'TAM R$ 100M-1B, razoavelmente fundamentado',
-            2: 'TAM < R$ 100M ou mal fundamentado',
-            1: 'TAM inexistente ou irrealista'
-          }
+          options: [
+            { value: 5, label: 'TAM > R$ 10 bilhões (bem fundamentado)', score: 5 },
+            { value: 4, label: 'TAM R$ 1-10 bilhões (fundamentado)', score: 4 },
+            { value: 3, label: 'TAM R$ 100M-1B (razoavelmente fundamentado)', score: 3 },
+            { value: 2, label: 'TAM < R$ 100M (mal fundamentado)', score: 2 },
+            { value: 1, label: 'TAM inexistente ou irrealista', score: 1 }
+          ]
         },
         {
           id: 'p2_2',
@@ -174,42 +172,42 @@ export const questionnaireData = {
         },
         {
           id: 'p2_3',
-          type: 'currency',
+          type: 'select',
           question: 'Qual o tamanho do mercado endereçável (SAM) para sua solução?',
           required: true,
-          scoring: {
-            5: 'SAM bem segmentado, 10-30% do TAM',
-            4: 'SAM razoavelmente segmentado',
-            3: 'SAM identificado mas genérico',
-            2: 'SAM mal definido',
-            1: 'SAM inexistente'
-          }
+          options: [
+            { value: 5, label: 'SAM bem segmentado (10-30% do TAM)', score: 5 },
+            { value: 4, label: 'SAM razoavelmente segmentado', score: 4 },
+            { value: 3, label: 'SAM identificado mas genérico', score: 3 },
+            { value: 2, label: 'SAM mal definido', score: 2 },
+            { value: 1, label: 'SAM inexistente', score: 1 }
+          ]
         },
         {
           id: 'p2_4',
-          type: 'percentage',
+          type: 'select',
           question: 'Qual sua meta de participação de mercado em 3 anos?',
           required: true,
-          scoring: {
-            5: 'Meta realista (0.1-2% do TAM)',
-            4: 'Meta otimista mas possível',
-            3: 'Meta moderada',
-            2: 'Meta muito conservadora',
-            1: 'Meta irrealista (>5% do TAM)'
-          }
+          options: [
+            { value: 5, label: 'Meta realista (0.1-2% do TAM)', score: 5 },
+            { value: 4, label: 'Meta otimista mas possível (2-3% do TAM)', score: 4 },
+            { value: 3, label: 'Meta moderada (<1% do TAM)', score: 3 },
+            { value: 2, label: 'Meta muito conservadora (<0.1% do TAM)', score: 2 },
+            { value: 1, label: 'Meta irrealista (>5% do TAM)', score: 1 }
+          ]
         },
         {
           id: 'p2_5',
-          type: 'textarea',
-          question: 'Quem é seu cliente ideal (persona principal)?',
+          type: 'select',
+          question: 'Qual o nível de detalhamento da sua persona principal?',
           required: true,
-          scoring: {
-            5: 'Persona detalhada com dados demográficos, comportamentais e necessidades',
-            4: 'Persona clara com bom detalhamento',
-            3: 'Persona básica mas identificável',
-            2: 'Persona vaga',
-            1: 'Persona inexistente'
-          }
+          options: [
+            { value: 5, label: 'Persona detalhada com dados demográficos, comportamentais e necessidades', score: 5 },
+            { value: 4, label: 'Persona clara com bom detalhamento', score: 4 },
+            { value: 3, label: 'Persona básica mas identificável', score: 3 },
+            { value: 2, label: 'Persona vaga ou genérica', score: 2 },
+            { value: 1, label: 'Persona inexistente ou mal definida', score: 1 }
+          ]
         },
         {
           id: 'p2_6',
@@ -229,7 +227,7 @@ export const questionnaireData = {
     {
       id: 'team',
       title: 'Equipe e Execução',
-      weight: 0.17,
+      weight: 0.15,
       description: 'Avaliação da experiência da equipe, competências e histórico de execução',
       questions: [
         {
@@ -259,52 +257,154 @@ export const questionnaireData = {
         },
         {
           id: 'p3_3',
-          type: 'boolean_with_details',
-          question: 'Algum fundador já criou uma empresa antes?',
+          type: 'select',
+          question: 'Qual a experiência empreendedora dos fundadores?',
           required: true,
-          details: 'Se sim, qual foi o resultado? (Exit, falência, ainda ativa)',
-          scoring: {
-            5: 'Exit bem-sucedido anterior',
-            4: 'Empresa anterior ainda ativa e bem-sucedida',
-            3: 'Experiência anterior com aprendizados',
-            2: 'Primeira empresa',
-            1: 'Falência anterior sem aprendizados'
-          }
+          options: [
+            { value: 5, label: 'Exit bem-sucedido anterior', score: 5 },
+            { value: 4, label: 'Empresa anterior ainda ativa e bem-sucedida', score: 4 },
+            { value: 3, label: 'Experiência anterior com aprendizados importantes', score: 3 },
+            { value: 2, label: 'Primeira empresa', score: 2 },
+            { value: 1, label: 'Falência anterior sem aprendizados', score: 1 }
+          ]
         }
       ]
     },
     {
       id: 'technology',
       title: 'Tecnologia e Produto',
-      weight: 0.15,
+      weight: 0.22,
       description: 'Avaliação da inovação tecnológica, qualidade do produto e escalabilidade técnica',
       questions: [
         {
           id: 'p4_1',
-          type: 'textarea',
-          question: 'Qual o diferencial tecnológico da sua solução?',
+          type: 'select',
+          question: 'Qual o nível de inovação tecnológica da sua solução?',
           required: true,
-          scoring: {
-            5: 'Inovação disruptiva comprovada',
-            4: 'Inovação significativa',
-            3: 'Melhoria incremental relevante',
-            2: 'Pequena melhoria',
-            1: 'Sem diferencial tecnológico'
-          }
+          options: [
+            { value: 5, label: 'Tecnologia disruptiva/patenteável', score: 5 },
+            { value: 4, label: 'Inovação significativa com diferencial técnico', score: 4 },
+            { value: 3, label: 'Melhoria incremental relevante', score: 3 },
+            { value: 2, label: 'Implementação padrão com pequenas melhorias', score: 2 },
+            { value: 1, label: 'Tecnologia commoditizada', score: 1 }
+          ]
         },
         {
           id: 'p4_2',
-          type: 'boolean_with_details',
-          question: 'Vocês possuem propriedade intelectual (patentes, marcas)?',
+          type: 'select',
+          question: 'Qual a arquitetura principal da sua solução?',
           required: true,
-          details: 'Se sim, especifique quais e status',
-          scoring: {
-            5: 'Múltiplas patentes concedidas',
-            4: 'Patentes em processo + marcas',
-            3: 'Algumas proteções IP',
-            2: 'IP básica',
-            1: 'Sem proteção IP'
-          }
+          options: [
+            { value: 5, label: 'Microserviços cloud-native', score: 5 },
+            { value: 4, label: 'Arquitetura distribuída escalável', score: 4 },
+            { value: 3, label: 'Monolito modular bem estruturado', score: 3 },
+            { value: 2, label: 'Arquitetura tradicional', score: 2 },
+            { value: 1, label: 'Arquitetura legada/monolítica', score: 1 }
+          ]
+        },
+        {
+          id: 'p4_3',
+          type: 'select',
+          question: 'Qual o stack tecnológico principal?',
+          required: true,
+          options: [
+            { value: 5, label: 'Stack moderno (React/Vue + Node/Python + Cloud)', score: 5 },
+            { value: 4, label: 'Stack atual (frameworks recentes)', score: 4 },
+            { value: 3, label: 'Stack estável (tecnologias consolidadas)', score: 3 },
+            { value: 2, label: 'Stack misto (moderno + legado)', score: 2 },
+            { value: 1, label: 'Stack legado (tecnologias desatualizadas)', score: 1 }
+          ]
+        },
+        {
+          id: 'p4_4',
+          type: 'select',
+          question: 'Qual o nível de automação no desenvolvimento?',
+          required: true,
+          options: [
+            { value: 5, label: 'CI/CD completo + testes automatizados + deploy automático', score: 5 },
+            { value: 4, label: 'CI/CD + testes automatizados', score: 4 },
+            { value: 3, label: 'Integração contínua básica', score: 3 },
+            { value: 2, label: 'Automação parcial', score: 2 },
+            { value: 1, label: 'Processo manual', score: 1 }
+          ]
+        },
+        {
+          id: 'p4_5',
+          type: 'select',
+          question: 'Qual o grau de escalabilidade técnica da solução?',
+          required: true,
+          options: [
+            { value: 5, label: 'Auto-scaling + load balancing + CDN global', score: 5 },
+            { value: 4, label: 'Escalabilidade horizontal implementada', score: 4 },
+            { value: 3, label: 'Escalabilidade vertical configurada', score: 3 },
+            { value: 2, label: 'Escalabilidade planejada mas não implementada', score: 2 },
+            { value: 1, label: 'Sem estratégia de escalabilidade', score: 1 }
+          ]
+        },
+        {
+          id: 'p4_6',
+          type: 'select',
+          question: 'Qual o nível de segurança implementado?',
+          required: true,
+          options: [
+            { value: 5, label: 'Certificações de segurança + penetration tests + compliance', score: 5 },
+            { value: 4, label: 'Segurança robusta + monitoramento', score: 4 },
+            { value: 3, label: 'Segurança básica implementada', score: 3 },
+            { value: 2, label: 'Segurança mínima', score: 2 },
+            { value: 1, label: 'Segurança inadequada', score: 1 }
+          ]
+        },
+        {
+          id: 'p4_7',
+          type: 'select',
+          question: 'Qual o nível de monitoramento e observabilidade?',
+          required: true,
+          options: [
+            { value: 5, label: 'Observabilidade completa (logs, métricas, traces, alertas)', score: 5 },
+            { value: 4, label: 'Monitoramento robusto + alertas', score: 4 },
+            { value: 3, label: 'Monitoramento básico', score: 3 },
+            { value: 2, label: 'Monitoramento limitado', score: 2 },
+            { value: 1, label: 'Sem monitoramento adequado', score: 1 }
+          ]
+        },
+        {
+          id: 'p4_8',
+          type: 'select',
+          question: 'Vocês possuem propriedade intelectual (patentes, código proprietário)?',
+          required: true,
+          options: [
+            { value: 5, label: 'Múltiplas patentes concedidas + IP forte', score: 5 },
+            { value: 4, label: 'Patentes em processo + algoritmos proprietários', score: 4 },
+            { value: 3, label: 'Algumas proteções IP + código proprietário', score: 3 },
+            { value: 2, label: 'IP básica registrada', score: 2 },
+            { value: 1, label: 'Sem proteção IP significativa', score: 1 }
+          ]
+        },
+        {
+          id: 'p4_9',
+          type: 'select',
+          question: 'Qual a maturidade do seu processo de desenvolvimento?',
+          required: true,
+          options: [
+            { value: 5, label: 'Metodologias ágeis maduras + DevOps + métricas de qualidade', score: 5 },
+            { value: 4, label: 'Scrum/Kanban bem implementado', score: 4 },
+            { value: 3, label: 'Processo organizado com metodologia', score: 3 },
+            { value: 2, label: 'Processo básico estruturado', score: 2 },
+            { value: 1, label: 'Desenvolvimento ad-hoc', score: 1 }
+          ]
+        },
+        {
+          id: 'p4_10',
+          type: 'select',
+          question: 'Qual a experiência técnica da equipe de desenvolvimento?',
+          required: true,
+          options: [
+            { value: 5, label: 'Sêniors com experiência em startups de sucesso', score: 5 },
+            { value: 4, label: 'Equipe sênior com track record', score: 4 },
+            { value: 3, label: 'Mix de sêniors e plenos', score: 3 },
+            { value: 2, label: 'Equipe predominantemente plena', score: 2 },
+            { value: 1, label: 'Equipe júnior ou inexperiente', score: 1 }
+          ]
         }
       ]
     },
@@ -320,26 +420,65 @@ export const questionnaireData = {
           question: 'Qual seu modelo de receita principal?',
           required: true,
           options: [
-            { value: 5, label: 'Assinatura', score: 5 },
-            { value: 4, label: 'Transação', score: 4 },
-            { value: 4, label: 'Marketplace', score: 4 },
-            { value: 3, label: 'Freemium', score: 3 },
-            { value: 2, label: 'Publicidade', score: 2 },
-            { value: 3, label: 'Licenciamento', score: 3 },
-            { value: 1, label: 'Outro', score: 1 }
+            { value: 5, label: 'SaaS (Assinatura recorrente)', score: 5 },
+            { value: 4, label: 'Marketplace com comissão', score: 4 },
+            { value: 4, label: 'Licenciamento de software', score: 4 },
+            { value: 3, label: 'Freemium com conversão', score: 3 },
+            { value: 3, label: 'Transação/Taxa por uso', score: 3 },
+            { value: 2, label: 'Publicidade/Ads', score: 2 },
+            { value: 1, label: 'Venda única/Projeto', score: 1 }
           ]
         },
         {
           id: 'p5_2',
           type: 'currency',
-          question: 'Qual o ticket médio por cliente?',
+          question: 'Qual o ticket médio mensal por cliente?',
           required: true,
           scoring: {
-            5: 'Ticket alto (>R$ 1000) e crescente',
-            4: 'Ticket médio (R$ 100-1000)',
-            3: 'Ticket baixo mas volume alto',
-            2: 'Ticket muito baixo',
-            1: 'Ticket indefinido'
+            5: 'Ticket >R$ 1000/mês',
+            4: 'Ticket R$ 300-1000/mês',
+            3: 'Ticket R$ 100-300/mês',
+            2: 'Ticket R$ 30-100/mês',
+            1: 'Ticket <R$ 30/mês'
+          }
+        },
+        {
+          id: 'p5_3',
+          type: 'percentage',
+          question: 'Qual a margem bruta do produto/serviço?',
+          required: true,
+          scoring: {
+            5: 'Margem >80%',
+            4: 'Margem 60-80%',
+            3: 'Margem 40-60%',
+            2: 'Margem 20-40%',
+            1: 'Margem <20%'
+          }
+        },
+        {
+          id: 'p5_4',
+          type: 'currency',
+          question: 'Qual o burn rate mensal atual?',
+          required: true,
+          scoring: {
+            5: 'Burn <R$ 20k/mês',
+            4: 'Burn R$ 20k-50k/mês',
+            3: 'Burn R$ 50k-100k/mês',
+            2: 'Burn R$ 100k-200k/mês',
+            1: 'Burn >R$ 200k/mês'
+          }
+        },
+        {
+          id: 'p5_5',
+          type: 'number',
+          question: 'Quantos meses de runway vocês têm?',
+          required: true,
+          scoring: {
+            5: '>18 meses de runway',
+            4: '12-18 meses de runway',
+            3: '6-12 meses de runway',
+            2: '3-6 meses de runway',
+            1: '<3 meses de runway'
           }
         }
       ]
@@ -347,13 +486,26 @@ export const questionnaireData = {
     {
       id: 'traction',
       title: 'Tração e Métricas',
-      weight: 0.10,
+      weight: 0.14,
       description: 'Avaliação do crescimento, métricas de engajamento e receita',
       questions: [
         {
           id: 'p6_1',
+          type: 'number',
+          question: 'Quantos usuários ativos mensais (MAU) vocês têm?',
+          required: true,
+          scoring: {
+            5: '>100.000 MAU',
+            4: '10.000-100.000 MAU',
+            3: '1.000-10.000 MAU',
+            2: '100-1.000 MAU',
+            1: '<100 MAU'
+          }
+        },
+        {
+          id: 'p6_2',
           type: 'percentage',
-          question: 'Qual o crescimento mensal de usuários?',
+          question: 'Qual o crescimento mensal de usuários (MoM)?',
           required: true,
           scoring: {
             5: 'Crescimento >20% ao mês',
@@ -364,7 +516,7 @@ export const questionnaireData = {
           }
         },
         {
-          id: 'p6_2',
+          id: 'p6_3',
           type: 'number',
           question: 'Quantos clientes pagantes vocês têm?',
           required: true,
@@ -375,40 +527,118 @@ export const questionnaireData = {
             2: '1-10 clientes pagantes',
             1: '0 clientes pagantes'
           }
+        },
+        {
+          id: 'p6_4',
+          type: 'currency',
+          question: 'Qual a receita recorrente mensal (MRR) atual?',
+          required: true,
+          scoring: {
+            5: 'MRR >R$ 100k',
+            4: 'MRR R$ 20k-100k',
+            3: 'MRR R$ 5k-20k',
+            2: 'MRR R$ 1k-5k',
+            1: 'MRR <R$ 1k'
+          }
+        },
+        {
+          id: 'p6_5',
+          type: 'percentage',
+          question: 'Qual a taxa de churn mensal?',
+          required: true,
+          scoring: {
+            5: 'Churn <2% ao mês',
+            4: 'Churn 2-5% ao mês',
+            3: 'Churn 5-10% ao mês',
+            2: 'Churn 10-20% ao mês',
+            1: 'Churn >20% ao mês'
+          }
+        },
+        {
+          id: 'p6_6',
+          type: 'currency',
+          question: 'Qual o CAC (Custo de Aquisição de Cliente) médio?',
+          required: true,
+          scoring: {
+            5: 'CAC muito eficiente (<10% do LTV)',
+            4: 'CAC eficiente (10-20% do LTV)',
+            3: 'CAC aceitável (20-30% do LTV)',
+            2: 'CAC alto (30-50% do LTV)',
+            1: 'CAC insustentável (>50% do LTV)'
+          }
+        },
+        {
+          id: 'p6_7',
+          type: 'select',
+          question: 'Qual o principal canal de aquisição de clientes?',
+          required: true,
+          options: [
+            { value: 5, label: 'Viral/Orgânico', score: 5 },
+            { value: 4, label: 'Inbound Marketing', score: 4 },
+            { value: 3, label: 'Vendas diretas', score: 3 },
+            { value: 2, label: 'Publicidade paga', score: 2 },
+            { value: 1, label: 'Sem canal definido', score: 1 }
+          ]
         }
       ]
     },
     {
       id: 'scalability',
       title: 'Escalabilidade e Crescimento',
-      weight: 0.05,
+      weight: 0.10,
       description: 'Avaliação do potencial de escala e plano de expansão',
       questions: [
         {
           id: 'p7_1',
           type: 'select',
-          question: 'Seu modelo de negócio é escalável?',
+          question: 'Qual a escalabilidade técnica da sua solução?',
           required: true,
           options: [
-            { value: 5, label: 'Muito escalável', score: 5 },
-            { value: 4, label: 'Escalável', score: 4 },
+            { value: 5, label: 'Altamente escalável (cloud-native, auto-scaling)', score: 5 },
+            { value: 4, label: 'Escalável (arquitetura preparada)', score: 4 },
             { value: 3, label: 'Moderadamente escalável', score: 3 },
-            { value: 2, label: 'Pouco escalável', score: 2 },
-            { value: 1, label: 'Não escalável', score: 1 }
+            { value: 2, label: 'Limitações de escalabilidade identificadas', score: 2 },
+            { value: 1, label: 'Não escalável tecnicamente', score: 1 }
           ]
         },
         {
           id: 'p7_2',
+          type: 'select',
+          question: 'Qual a capacidade atual de crescimento do time técnico?',
+          required: true,
+          options: [
+            { value: 5, label: 'Processo estruturado de hiring + onboarding', score: 5 },
+            { value: 4, label: 'Capacidade de duplicar time em 6 meses', score: 4 },
+            { value: 3, label: 'Crescimento gradual planejado', score: 3 },
+            { value: 2, label: 'Limitações para crescer equipe', score: 2 },
+            { value: 1, label: 'Sem capacidade de escalar time', score: 1 }
+          ]
+        },
+        {
+          id: 'p7_3',
           type: 'currency',
-          question: 'Quanto capital vocês precisam para os próximos 18 meses?',
+          question: 'Quanto capital vocês precisam para escalar nos próximos 18 meses?',
           required: true,
           scoring: {
-            5: 'Necessidade bem calculada e justificada',
-            4: 'Estimativa fundamentada',
-            3: 'Estimativa razoável',
-            2: 'Estimativa vaga',
-            1: 'Não sabe quanto precisa'
+            5: 'Necessidade bem calculada (<R$ 2M)',
+            4: 'Estimativa fundamentada (R$ 2-5M)',
+            3: 'Estimativa razoável (R$ 5-10M)',
+            2: 'Necessidade alta (R$ 10-20M)',
+            1: 'Necessidade excessiva (>R$ 20M)'
           }
+        },
+        {
+          id: 'p7_4',
+          type: 'select',
+          question: 'Qual o potencial de expansão geográfica?',
+          required: true,
+          options: [
+            { value: 5, label: 'Global desde o design (multi-idioma, multi-moeda)', score: 5 },
+            { value: 4, label: 'Expansão LatAm planejada', score: 4 },
+            { value: 3, label: 'Nacional com potential internacional', score: 3 },
+            { value: 2, label: 'Regional/Nacional apenas', score: 2 },
+            { value: 1, label: 'Local/Limitado geograficamente', score: 1 }
+          ]
         }
       ]
     }
@@ -416,10 +646,40 @@ export const questionnaireData = {
 };
 
 export const scoringRanges = {
-  excellent: { min: 85, max: 100, label: 'Investimento Recomendado', color: 'green', description: 'Startup com alto potencial' },
-  good: { min: 70, max: 84, label: 'Potencial Interessante', color: 'blue', description: 'Startup com bom potencial' },
-  average: { min: 55, max: 69, label: 'Potencial Médio', color: 'yellow', description: 'Startup em desenvolvimento' },
-  poor: { min: 40, max: 54, label: 'Baixo Potencial', color: 'orange', description: 'Startup com muitos desafios' },
-  bad: { min: 0, max: 39, label: 'Não Recomendado', color: 'red', description: 'Startup com problemas fundamentais' }
+  excellent: { 
+    min: 80, 
+    max: 100, 
+    label: 'Investimento Altamente Recomendado', 
+    color: 'green', 
+    description: 'Startup tech de alto potencial' 
+  },
+  good: { 
+    min: 70, 
+    max: 79, 
+    label: 'Potencial Interessante', 
+    color: 'blue', 
+    description: 'Startup tech com bom potencial' 
+  },
+  average: { 
+    min: 60, 
+    max: 69, 
+    label: 'Potencial Médio', 
+    color: 'yellow', 
+    description: 'Startup em desenvolvimento - monitorar' 
+  },
+  poor: { 
+    min: 45, 
+    max: 59, 
+    label: 'Baixo Potencial', 
+    color: 'orange', 
+    description: 'Requer melhorias significativas' 
+  },
+  bad: { 
+    min: 0, 
+    max: 44, 
+    label: 'Não Recomendado', 
+    color: 'red', 
+    description: 'Problemas fundamentais - alto risco' 
+  }
 };
 

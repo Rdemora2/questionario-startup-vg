@@ -2,6 +2,7 @@ export const automaticAnalysis = {
   validateConsistency: (answers) => {
     const warnings = [];
 
+    // Validações originais melhoradas
     const stage = answers["p1_10"];
     const mau = parseFloat(answers["p6_1"]) || 0;
     const clients = parseFloat(answers["p6_3"]) || 0;
@@ -11,12 +12,40 @@ export const automaticAnalysis = {
         type: "consistency",
         message: "Produto em estágio avançado mas métricas de tração baixas",
         severity: "high",
+        impact: "Inconsistência entre maturidade declarada e dados reais"
       });
     }
 
+    // Validação financeira cruzada aprimorada
     const burnRate = parseFloat(answers["p5_4"]) || 0;
     const runway = parseFloat(answers["p5_5"]) || 0;
+    const mrr = parseFloat(answers["p5_2"]) || 0;
+    const totalClients = parseFloat(answers["p6_3"]) || 0;
 
+    // Cross-validation MRR vs Clientes vs Estágio
+    if (totalClients > 0 && mrr > 0) {
+      const ticketMedio = mrr / totalClients;
+      
+      if (ticketMedio < 10) {
+        warnings.push({
+          type: "financial_inconsistency",
+          message: `Ticket médio muito baixo: R$ ${ticketMedio.toFixed(2)} por cliente`,
+          severity: "high",
+          impact: "Modelo de negócio pode não ser sustentável"
+        });
+      }
+      
+      if (ticketMedio > 10000 && totalClients < 10) {
+        warnings.push({
+          type: "market_validation",
+          message: `Alto ticket (R$ ${ticketMedio.toFixed(2)}) com poucos clientes (${totalClients})`,
+          severity: "medium",
+          impact: "Necessário validar se mercado suporta esse pricing"
+        });
+      }
+    }
+
+    // Validação Runway vs Burn Rate
     if (burnRate > 0 && runway > 0) {
       const calculatedRunway = Math.floor(1000000 / burnRate);
       if (Math.abs(calculatedRunway - runway) > 6) {
@@ -24,19 +53,64 @@ export const automaticAnalysis = {
           type: "financial",
           message: "Runway informado inconsistente com burn rate",
           severity: "medium",
+          impact: "Possível erro nos dados financeiros"
+        });
+      }
+
+      // Alerta para runway crítico
+      if (runway < 6) {
+        warnings.push({
+          type: "cash_critical",
+          message: `Runway crítico: apenas ${runway} meses restantes`,
+          severity: "high",
+          impact: "Necessidade urgente de captação ou redução de custos"
         });
       }
     }
 
+    // Validação Business Model vs Ticket
     const businessModel = answers["p5_1"];
     const ticket = parseFloat(answers["p5_2"]) || 0;
 
     if (businessModel === 5 && ticket < 100) {
       warnings.push({
         type: "business",
-        message:
-          "Modelo SaaS com ticket médio muito baixo pode ter problemas de escalabilidade",
+        message: "Modelo SaaS com ticket médio muito baixo pode ter problemas de escalabilidade",
         severity: "medium",
+        impact: "Dificuldade para alcançar unit economics positivos"
+      });
+    }
+
+    // Nova validação: Crescimento vs Base instalada
+    const growth = parseFloat(answers["p6_2"]) || 0;
+    if (growth > 20 && mau < 500) {
+      warnings.push({
+        type: "growth_sustainability",
+        message: `Alto crescimento (${growth}%/mês) com base pequena (${mau} MAU)`,
+        severity: "medium",
+        impact: "Crescimento pode não ser sustentável"
+      });
+    }
+
+    // Validação Team vs Estágio
+    const teamSize = parseFloat(answers["p3_1"]) || 0;
+    const techTeam = parseFloat(answers["p3_4"]) || 0;
+    
+    if (stage >= 4 && teamSize < 5) {
+      warnings.push({
+        type: "team_scaling",
+        message: `Equipe pequena (${teamSize} pessoas) para estágio avançado`,
+        severity: "medium",
+        impact: "Capacidade limitada de execução"
+      });
+    }
+
+    if (techTeam < 2 && businessModel === 5) {
+      warnings.push({
+        type: "tech_capacity",
+        message: `Time técnico insuficiente (${techTeam} devs) para SaaS`,
+        severity: "high",
+        impact: "Risco alto de problemas de desenvolvimento"
       });
     }
 

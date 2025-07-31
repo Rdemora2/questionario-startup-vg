@@ -67,6 +67,8 @@ export const StartupQuestionnaire = () => {
     if (validateCategory(currentCategoryIndex)) {
       if (currentCategoryIndex < categories.length - 1) {
         setCurrentCategoryIndex((prev) => prev + 1);
+        // Scroll suave para o topo
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         calculateResults();
       }
@@ -76,11 +78,14 @@ export const StartupQuestionnaire = () => {
   const handlePrevious = () => {
     if (currentCategoryIndex > 0) {
       setCurrentCategoryIndex((prev) => prev - 1);
+      // Scroll suave para o topo
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const calculateQuestionScore = (question, answer) => {
-    if (!answer) return 0;
+    // Verificação mais rigorosa para aceitar 0 como valor válido
+    if (answer === null || answer === undefined || answer === '') return 0;
 
     if (question.options) {
       const option = question.options.find((opt) => opt.value === answer);
@@ -201,90 +206,73 @@ export const StartupQuestionnaire = () => {
     }
   };
 
-  const calculateTextScore = (question, text) => {
-    if (!text || text.length < 10) return 1;
+    const calculateTextScore = (question, answer) => {
+    if (!answer || answer.trim().length < 10) return 1;
 
-    const lowercaseText = text.toLowerCase();
-    let score = 3;
+    const text = answer.toLowerCase();
+    const length = text.length;
+    
+    // Palavras-chave positivas mais sofisticadas
+    const positiveKeywords = {
+      tecnologia: ['ai', 'machine learning', 'blockchain', 'api', 'saas', 'cloud', 'microservices', 'docker', 'kubernetes', 'aws', 'azure', 'react', 'python', 'node.js', 'postgresql', 'mongodb', 'redis'],
+      crescimento: ['escalavel', 'escalabilidade', 'automacao', 'otimizacao', 'melhoria', 'crescimento', 'expansao', 'mercado', 'inovacao', 'disruptivo'],
+      negocio: ['receita', 'lucro', 'mrr', 'arr', 'ltv', 'cac', 'roi', 'margem', 'unidades economicas', 'modelo de negocio', 'monetizacao'],
+      validacao: ['clientes', 'usuarios', 'feedback', 'teste', 'validacao', 'piloto', 'poc', 'mvp', 'product market fit', 'tração'],
+      experiencia: ['anos', 'experiencia', 'especialista', 'lider', 'gestor', 'fundador', 'startup anterior', 'exit', 'ipo', 'aquisicao']
+    };
 
-    switch (question.id) {
-      case "p1_1": {
-        const problemKeywords = [
-          "específico",
-          "mensurado",
-          "quantificado",
-          "pesquisa",
-          "validado",
-        ];
-        if (problemKeywords.some((word) => lowercaseText.includes(word)))
-          score += 1;
-        if (text.length > 100) score += 1;
-        break;
-      }
+    // Palavras-chave negativas
+    const negativeKeywords = ['talvez', 'nao sei', 'incerto', 'indefinido', 'vago', 'sem dados', 'sem experiencia', 'primeira vez', 'aprendendo'];
 
-      case "p1_4": {
-        const altKeywords = [
-          "concorrentes",
-          "limitações",
-          "gargalos",
-          "ineficiências",
-        ];
-        if (altKeywords.some((word) => lowercaseText.includes(word)))
-          score += 1;
-        break;
-      }
+    let score = 2; // Score base
+    
+    // Pontuação por comprimento e qualidade
+    if (length > 100) score += 0.5;
+    if (length > 200) score += 0.5;
+    if (length > 300) score += 0.5;
 
-      case "p1_5": {
-        const uvpKeywords = ["único", "exclusivo", "diferencial", "inovação"];
-        if (uvpKeywords.some((word) => lowercaseText.includes(word)))
-          score += 1;
-        break;
-      }
+    // Análise de keywords positivas
+    Object.values(positiveKeywords).forEach(keywords => {
+      const matches = keywords.filter(keyword => text.includes(keyword)).length;
+      if (matches > 0) score += Math.min(matches * 0.3, 1.0); // Max 1 ponto por categoria
+    });
 
-      case "p1_6": {
-        const diffKeywords = [
-          "patenteado",
-          "proprietário",
-          "exclusivo",
-          "barreira",
-        ];
-        if (diffKeywords.some((word) => lowercaseText.includes(word)))
-          score += 1;
-        break;
-      }
+    // Penalização por keywords negativas
+    const negativeMatches = negativeKeywords.filter(keyword => text.includes(keyword)).length;
+    score -= negativeMatches * 0.4;
 
-      case "p1_8": {
-        const solKeywords = [
-          "arquitetura",
-          "algoritmo",
-          "tecnologia",
-          "implementação",
-        ];
-        if (solKeywords.some((word) => lowercaseText.includes(word)))
-          score += 1;
-        break;
-      }
+    // Bonificação por especificidade (números, percentuais, valores)
+    const hasNumbers = /\d+/.test(text);
+    const hasPercentages = /%/.test(text);
+    const hasCurrency = /r\$|reais|dollars|\$/.test(text);
+    
+    if (hasNumbers) score += 0.3;
+    if (hasPercentages) score += 0.3;
+    if (hasCurrency) score += 0.3;
 
-      case "p2_5": {
-        const personaKeywords = [
-          "idade",
-          "renda",
-          "comportamento",
-          "necessidades",
-          "dores",
-        ];
-        if (personaKeywords.some((word) => lowercaseText.includes(word)))
-          score += 1;
-        break;
-      }
-    }
+    // Bonificação por estrutura (listas, bullet points)
+    const hasBullets = text.includes('-') || text.includes('•') || text.includes('*');
+    if (hasBullets) score += 0.2;
 
-    return Math.min(Math.max(score, 1), 5);
+    // Análise de sentimento básica
+    const confidenceWords = ['certeza', 'confiante', 'comprovado', 'validado', 'testado'];
+    const uncertainWords = ['acho', 'talvez', 'possivelmente', 'provavelmente'];
+    
+    const confidenceMatches = confidenceWords.filter(word => text.includes(word)).length;
+    const uncertainMatches = uncertainWords.filter(word => text.includes(word)).length;
+    
+    score += confidenceMatches * 0.2;
+    score -= uncertainMatches * 0.3;
+
+    return Math.max(1, Math.min(5, score));
   };
 
   const calculateResults = () => {
     const categoryScores = {};
     let totalScore = 0;
+
+    // Obter estágio da startup para ajuste dinâmico de pesos
+    const stage = answers["p1_10"] || 1;
 
     categories.forEach((category) => {
       let categoryTotal = 0;
@@ -302,13 +290,27 @@ export const StartupQuestionnaire = () => {
 
       const normalizedAverage = categoryAverage / 5;
 
-      const weightedScore = normalizedAverage * category.weight * 100;
+      // Ajuste dinâmico de pesos baseado no estágio
+      let adjustedWeight = category.weight;
+      
+      if (stage <= 2) { // Early stage - foco em validação e mercado
+        if (category.id === 'validation') adjustedWeight *= 1.3;
+        if (category.id === 'market') adjustedWeight *= 1.2;
+        if (category.id === 'technology') adjustedWeight *= 0.8;
+        if (category.id === 'traction') adjustedWeight *= 0.7;
+      } else if (stage >= 4) { // Growth stage - foco em tecnologia e tração
+        if (category.id === 'technology') adjustedWeight *= 1.2;
+        if (category.id === 'traction') adjustedWeight *= 1.3;
+        if (category.id === 'validation') adjustedWeight *= 0.8;
+      }
+
+      const weightedScore = normalizedAverage * adjustedWeight * 100;
 
       categoryScores[category.id] = {
         title: category.title,
         average: categoryAverage,
         weightedScore: weightedScore,
-        weight: category.weight,
+        weight: adjustedWeight,
         maxScore: 5,
         questions: category.questions.map((q) => ({
           id: q.id,
@@ -401,7 +403,10 @@ export const StartupQuestionnaire = () => {
                 key={category.id}
                 variant={isActive ? "default" : "outline"}
                 size="sm"
-                onClick={() => setCurrentCategoryIndex(index)}
+                onClick={() => {
+                  setCurrentCategoryIndex(index);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
                 className={`flex items-center gap-2 ${
                   status === "completed"
                     ? "bg-green-50 border-green-200 text-green-700"

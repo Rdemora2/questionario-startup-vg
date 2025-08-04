@@ -1,0 +1,189 @@
+import { useState, useCallback } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { AlertCircle, ArrowRight, HelpCircle } from "lucide-react";
+
+const FormField = ({
+  label,
+  tooltip,
+  field,
+  type = "text",
+  placeholder,
+  value,
+  onChange,
+  error,
+}) => (
+  <div className="space-y-2">
+    <div className="flex items-center gap-2">
+      <Label htmlFor={field} className="text-sm font-medium">
+        {label}
+      </Label>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <HelpCircle className="h-4 w-4 text-gray-400 hover:text-gray-600 cursor-help" />
+          </TooltipTrigger>
+          <TooltipContent className="max-w-xs">
+            <p className="text-sm">{tooltip}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </div>
+    <Input
+      id={field}
+      type={type}
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+      className={`${error ? "border-red-500 focus:border-red-500" : ""}`}
+    />
+    {error && (
+      <div className="flex items-center gap-2 text-red-600 text-sm">
+        <AlertCircle className="h-4 w-4" />
+        <span>{error}</span>
+      </div>
+    )}
+  </div>
+);
+
+export const PreRegistration = ({ onComplete }) => {
+  const [formData, setFormData] = useState({
+    ideaName: "",
+    userName: "",
+    email: "",
+    whatsapp: "",
+  });
+
+  const [errors, setErrors] = useState({});
+
+  const handleInputChange = useCallback((field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+
+    setErrors((prev) => {
+      if (prev[field]) {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      }
+      return prev;
+    });
+  }, []);
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.ideaName.trim()) {
+      newErrors.ideaName = "Nome da ideia é obrigatório";
+    }
+
+    if (!formData.userName.trim()) {
+      newErrors.userName = "Seu nome é obrigatório";
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "E-mail é obrigatório";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "E-mail inválido";
+    }
+
+    if (!formData.whatsapp.trim()) {
+      newErrors.whatsapp = "WhatsApp é obrigatório";
+    } else if (
+      !/^\+?[\d\s\-()]{10,}$/.test(formData.whatsapp.replace(/\s/g, ""))
+    ) {
+      newErrors.whatsapp = "WhatsApp inválido (use formato: +55 11 99999-9999)";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (validateForm()) {
+      onComplete(formData);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold text-gray-900">
+            Vamos nos conhecer melhor!
+          </CardTitle>
+          <p className="text-gray-600 text-sm mt-2">
+            Antes de avaliarmos sua startup, precisamos de algumas informações
+            básicas.
+          </p>
+        </CardHeader>
+
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <FormField
+              label="Nome da ideia"
+              tooltip="Gostamos de chamar as coisas pelo nome, ajuda a acontecer"
+              field="ideaName"
+              placeholder="Ex: MeuApp, TechSolution..."
+              value={formData.ideaName}
+              onChange={(e) => handleInputChange("ideaName", e.target.value)}
+              error={errors.ideaName}
+            />
+
+            <FormField
+              label="Seu Nome"
+              tooltip="Precisamos nos conhecer melhor"
+              field="userName"
+              placeholder="Seu nome completo"
+              value={formData.userName}
+              onChange={(e) => handleInputChange("userName", e.target.value)}
+              error={errors.userName}
+            />
+
+            <FormField
+              label="Seu e-mail"
+              tooltip="Uma forma de conseguirmos passar mais detalhes e gerar uma conversa"
+              field="email"
+              type="email"
+              placeholder="seu@email.com"
+              value={formData.email}
+              onChange={(e) => handleInputChange("email", e.target.value)}
+              error={errors.email}
+            />
+
+            <FormField
+              label="Seu WhatsApp"
+              tooltip="Um jeito mais fácil de te contatar. Prometemos não enviar spam, blz?"
+              field="whatsapp"
+              type="tel"
+              placeholder="+55 11 99999-9999"
+              value={formData.whatsapp}
+              onChange={(e) => handleInputChange("whatsapp", e.target.value)}
+              error={errors.whatsapp}
+            />
+
+            <Button
+              type="submit"
+              className="w-full flex items-center justify-center gap-2"
+            >
+              Começar Avaliação
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};

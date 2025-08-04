@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { automaticAnalysis } from "../utils/automaticAnalysis";
-import jsPDF from 'jspdf';
+import jsPDF from "jspdf";
 import {
   BarChart3,
   TrendingUp,
@@ -23,7 +23,7 @@ import {
   FileText,
 } from "lucide-react";
 
-export const ResultsReport = ({ results, onRestart }) => {
+export const ResultsReport = ({ results, userInfo, onRestart }) => {
   const [activeTab, setActiveTab] = useState("overview");
 
   const automaticInsights = {
@@ -92,21 +92,24 @@ export const ResultsReport = ({ results, onRestart }) => {
       return {
         recommendation: "ALTAMENTE RECOMENDADO",
         risk: "Baixo",
-        action: "Startup com excelente potencial - prosseguir com due diligence",
+        action:
+          "Startup com excelente potencial - prosseguir com due diligence",
         amount: "Investimento completo conforme solicitado",
       };
     } else if (score >= 70) {
       return {
         recommendation: "RECOMENDADO",
         risk: "Baixo a Médio",
-        action: "Boa oportunidade de investimento com alguns pontos a acompanhar",
+        action:
+          "Boa oportunidade de investimento com alguns pontos a acompanhar",
         amount: "Investimento substancial com acompanhamento",
       };
     } else if (score >= 60) {
       return {
         recommendation: "POTENCIAL INTERESSANTE",
         risk: "Médio",
-        action: "Startup promissora que precisa de desenvolvimento em algumas áreas",
+        action:
+          "Startup promissora que precisa de desenvolvimento em algumas áreas",
         amount: "Investimento moderado com milestones",
       };
     } else if (score >= 45) {
@@ -120,7 +123,8 @@ export const ResultsReport = ({ results, onRestart }) => {
       return {
         recommendation: "NECESSITA MAIS DESENVOLVIMENTO",
         risk: "Alto",
-        action: "Recomendamos focarem no desenvolvimento antes de buscar investimento",
+        action:
+          "Recomendamos focarem no desenvolvimento antes de buscar investimento",
         amount: "Não recomendado no momento",
       };
     }
@@ -142,113 +146,132 @@ export const ResultsReport = ({ results, onRestart }) => {
   };
 
   const exportToPDF = async () => {
-    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdf = new jsPDF("p", "mm", "a4");
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
 
     let yPosition = 20;
-    
+
     // Header principal
     pdf.setFontSize(20);
-    pdf.setFont('helvetica', 'bold');
+    pdf.setFont("helvetica", "bold");
     pdf.setTextColor(0, 0, 0);
-    pdf.text('RELATÓRIO DE AVALIAÇÃO STARTUP', pageWidth/2, yPosition, { align: 'center' });
-    
+    pdf.text("RELATÓRIO DE AVALIAÇÃO STARTUP", pageWidth / 2, yPosition, {
+      align: "center",
+    });
+
     pdf.setFontSize(12);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, pageWidth/2, yPosition + 10, { align: 'center' });
-    
+    pdf.setFont("helvetica", "normal");
+    pdf.text(
+      `Data: ${new Date().toLocaleDateString("pt-BR")}`,
+      pageWidth / 2,
+      yPosition + 10,
+      { align: "center" }
+    );
+
     // Linha separadora
     pdf.setDrawColor(200, 200, 200);
     pdf.line(20, yPosition + 18, pageWidth - 20, yPosition + 18);
-    
+
     yPosition += 30;
-    
+
     // Score geral com destaque
     pdf.setFontSize(16);
-    pdf.setFont('helvetica', 'bold');
+    pdf.setFont("helvetica", "bold");
     pdf.setTextColor(0, 0, 0);
-    pdf.text('PONTUAÇÃO GERAL', 20, yPosition);
+    pdf.text("PONTUAÇÃO GERAL", 20, yPosition);
     yPosition += 15;
-    
+
     // Obter recomendação de investimento
     const investment = getInvestmentRecommendation();
-    
+
     // Caixa destacada para o score
     pdf.setDrawColor(100, 100, 100);
     pdf.setFillColor(245, 245, 245);
-    pdf.rect(20, yPosition - 8, 80, 20, 'FD');
-    
+    pdf.rect(20, yPosition - 8, 80, 20, "FD");
+
     pdf.setFontSize(24);
-    const scoreColor = results.totalScore >= 80 ? [0, 128, 0] : 
-                     results.totalScore >= 70 ? [0, 0, 255] :
-                     results.totalScore >= 60 ? [255, 165, 0] :
-                     results.totalScore >= 45 ? [255, 140, 0] : [255, 0, 0];
-    
+    const scoreColor =
+      results.totalScore >= 80
+        ? [0, 128, 0]
+        : results.totalScore >= 70
+          ? [0, 0, 255]
+          : results.totalScore >= 60
+            ? [255, 165, 0]
+            : results.totalScore >= 45
+              ? [255, 140, 0]
+              : [255, 0, 0];
+
     pdf.setTextColor(...scoreColor);
     pdf.text(`${results.totalScore.toFixed(1)}`, 30, yPosition + 5);
-    
+
     pdf.setFontSize(12);
     pdf.setTextColor(0, 0, 0);
-    pdf.text('/ 100', 70, yPosition + 5);
-    
+    pdf.text("/ 100", 70, yPosition + 5);
+
     // Status da recomendação
     pdf.setFontSize(10);
-    pdf.setFont('helvetica', 'bold');
+    pdf.setFont("helvetica", "bold");
     pdf.text(investment.recommendation, 110, yPosition - 2);
-    pdf.setFont('helvetica', 'normal');
+    pdf.setFont("helvetica", "normal");
     pdf.text(`Risco: ${investment.risk}`, 110, yPosition + 8);
-    
+
     yPosition += 25;
-    
+
     // Recomendação de investimento
     pdf.setFontSize(14);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('RECOMENDAÇÃO DE INVESTIMENTO', 20, yPosition);
+    pdf.setFont("helvetica", "bold");
+    pdf.text("RECOMENDAÇÃO DE INVESTIMENTO", 20, yPosition);
     yPosition += 10;
-    
+
     pdf.setFontSize(12);
-    pdf.setFont('helvetica', 'normal');
+    pdf.setFont("helvetica", "normal");
     pdf.text(`Status: ${investment.recommendation}`, 20, yPosition);
     yPosition += 8;
     pdf.text(`Risco: ${investment.risk}`, 20, yPosition);
     yPosition += 8;
-    pdf.text(`Ação: ${investment.action}`, 20, yPosition, { maxWidth: pageWidth - 40 });
+    pdf.text(`Ação: ${investment.action}`, 20, yPosition, {
+      maxWidth: pageWidth - 40,
+    });
     yPosition += 15;
-    
+
     // Scores por categoria
     pdf.setFontSize(14);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('PONTUAÇÃO POR CATEGORIA', 20, yPosition);
+    pdf.setFont("helvetica", "bold");
+    pdf.text("PONTUAÇÃO POR CATEGORIA", 20, yPosition);
     yPosition += 15;
-    
+
     Object.entries(results.categoryScores).forEach(([, data]) => {
       if (yPosition > pageHeight - 30) {
         pdf.addPage();
         yPosition = 20;
       }
-      
+
       pdf.setFontSize(11);
-      pdf.setFont('helvetica', 'bold');
+      pdf.setFont("helvetica", "bold");
       pdf.text(`${data.title}:`, 20, yPosition);
-      
-      pdf.setFont('helvetica', 'normal');
+
+      pdf.setFont("helvetica", "normal");
       const categoryScore = ((data.average / 5) * 100).toFixed(1);
       pdf.text(`${categoryScore}%`, 120, yPosition);
-      
+
       // Barra de progresso simples
       pdf.setDrawColor(200, 200, 200);
       pdf.rect(20, yPosition + 2, 80, 3);
-      
+
       const progressWidth = (data.average / 5) * 80;
-      const progressColor = data.average >= 4 ? [0, 128, 0] : 
-                           data.average >= 3 ? [255, 165, 0] : [255, 0, 0];
+      const progressColor =
+        data.average >= 4
+          ? [0, 128, 0]
+          : data.average >= 3
+            ? [255, 165, 0]
+            : [255, 0, 0];
       pdf.setFillColor(...progressColor);
-      pdf.rect(20, yPosition + 2, progressWidth, 3, 'F');
-      
+      pdf.rect(20, yPosition + 2, progressWidth, 3, "F");
+
       yPosition += 12;
     });
-    
+
     // Principais problemas
     if (automaticInsights.consistencyWarnings.length > 0) {
       yPosition += 10;
@@ -256,33 +279,47 @@ export const ResultsReport = ({ results, onRestart }) => {
         pdf.addPage();
         yPosition = 20;
       }
-      
+
       pdf.setFontSize(14);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('PRINCIPAIS ALERTAS', 20, yPosition);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("PRINCIPAIS ALERTAS", 20, yPosition);
       yPosition += 10;
-      
-      automaticInsights.consistencyWarnings.slice(0, 5).forEach((warning, index) => {
-        if (yPosition > pageHeight - 20) {
-          pdf.addPage();
-          yPosition = 20;
-        }
-        
-        pdf.setFontSize(10);
-        pdf.setFont('helvetica', 'normal');
-        pdf.text(`${index + 1}. ${warning.message}`, 20, yPosition, { maxWidth: pageWidth - 40 });
-        yPosition += 12;
-      });
+
+      automaticInsights.consistencyWarnings
+        .slice(0, 5)
+        .forEach((warning, index) => {
+          if (yPosition > pageHeight - 20) {
+            pdf.addPage();
+            yPosition = 20;
+          }
+
+          pdf.setFontSize(10);
+          pdf.setFont("helvetica", "normal");
+          pdf.text(`${index + 1}. ${warning.message}`, 20, yPosition, {
+            maxWidth: pageWidth - 40,
+          });
+          yPosition += 12;
+        });
     }
-    
+
     // Footer com informações da empresa
     pdf.setFontSize(8);
-    pdf.setFont('helvetica', 'normal');
+    pdf.setFont("helvetica", "normal");
     pdf.setTextColor(100, 100, 100);
-    pdf.text('Relatório gerado pelo Sistema de Avaliação de Startups', pageWidth/2, pageHeight - 15, { align: 'center' });
-    pdf.text('Valiant Group - Tecnologia e Inovação', pageWidth/2, pageHeight - 10, { align: 'center' });
-    
-    pdf.save(`avaliacao-startup-${new Date().toISOString().split('T')[0]}.pdf`);
+    pdf.text(
+      "Relatório gerado pelo Sistema de Avaliação de Startups",
+      pageWidth / 2,
+      pageHeight - 15,
+      { align: "center" }
+    );
+    pdf.text(
+      "Valiant Group - Tecnologia e Inovação",
+      pageWidth / 2,
+      pageHeight - 10,
+      { align: "center" }
+    );
+
+    pdf.save(`avaliacao-startup-${new Date().toISOString().split("T")[0]}.pdf`);
   };
 
   const recommendations = getRecommendations();
@@ -293,9 +330,18 @@ export const ResultsReport = ({ results, onRestart }) => {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Relatório de Avaliação da Startup
-          </h1>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Relatório de Avaliação da Startup
+            </h1>
+            {userInfo && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <p className="text-green-800 text-sm">
+                  ✅ Relatório gerado com sucesso! Uma cópia foi enviada automaticamente para análise da Valiant Group.
+                </p>
+              </div>
+            )}
+          </div>
           <div className="flex gap-2">
             <Button
               variant="outline"
@@ -659,8 +705,8 @@ export const ResultsReport = ({ results, onRestart }) => {
                             action.priority === "Crítica"
                               ? "destructive"
                               : action.priority === "Alta"
-                              ? "secondary"
-                              : "outline"
+                                ? "secondary"
+                                : "outline"
                           }
                         >
                           {action.priority}

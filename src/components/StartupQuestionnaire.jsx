@@ -7,6 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QuestionCard } from "./QuestionComponents";
 import { ResultsReport } from "./ResultsReport";
 import { questionnaireData, scoringRanges } from "../data/questions";
+import { sendQuestionnaireResults } from "../services/emailService";
+import jsPDF from 'jspdf';
 import {
   ChevronLeft,
   ChevronRight,
@@ -15,7 +17,7 @@ import {
   BarChart3,
 } from "lucide-react";
 
-export const StartupQuestionnaire = () => {
+export const StartupQuestionnaire = ({ userInfo, onRestart }) => {
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [errors, setErrors] = useState({});
@@ -312,12 +314,26 @@ export const StartupQuestionnaire = () => {
         weightedScore: weightedScore,
         weight: adjustedWeight,
         maxScore: 5,
-        questions: category.questions.map((q) => ({
-          id: q.id,
-          question: q.question,
-          answer: answers[q.id],
-          score: calculateQuestionScore(q, answers[q.id]),
-        })),
+        questions: category.questions.map((q) => {
+          const answer = answers[q.id];
+          let answerText = answer;
+          
+          // Para perguntas de múltipla escolha, buscar o texto da opção
+          if (q.options && answer !== null && answer !== undefined) {
+            const selectedOption = q.options.find(opt => opt.value === answer);
+            if (selectedOption) {
+              answerText = selectedOption.label;
+            }
+          }
+          
+          return {
+            id: q.id,
+            question: q.question,
+            answer: answer,
+            answerText: answerText,
+            score: calculateQuestionScore(q, answer),
+          };
+        }),
       };
 
       totalScore += weightedScore;
@@ -340,6 +356,109 @@ export const StartupQuestionnaire = () => {
 
     setResults(resultsData);
     setIsCompleted(true);
+
+    // Enviar email automaticamente após finalizar o questionário
+    if (userInfo) {
+      sendEmailAutomatically(resultsData);
+    }
+  };
+
+  const generatePDFBlob = async (resultsData) => {
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    let yPosition = 20;
+    
+    // Header principal com informações do usuário
+    pdf.setFontSize(20);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(0, 0, 0);
+    pdf.text('RELATÓRIO DE AVALIAÇÃO STARTUP', pageWidth/2, yPosition, { align: 'center' });
+    
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, pageWidth/2, yPosition + 10, { align: 'center' });
+    
+    if (userInfo) {
+      pdf.text(`Startup: ${userInfo.ideaName}`, pageWidth/2, yPosition + 18, { align: 'center' });
+      pdf.text(`Avaliado por: ${userInfo.userName}`, pageWidth/2, yPosition + 26, { align: 'center' });
+    }
+    
+    // Linha separadora
+    pdf.setDrawColor(200, 200, 200);
+    pdf.line(20, yPosition + 35, pageWidth - 20, yPosition + 35);
+    
+    yPosition += 45;
+    
+    // Score geral com destaque
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(0, 0, 0);
+    pdf.text('PONTUAÇÃO GERAL', 20, yPosition);
+    yPosition += 15;
+    
+    // Caixa destacada para o score
+    pdf.setDrawColor(100, 100, 100);
+    pdf.setFillColor(245, 245, 245);
+    pdf.rect(20, yPosition - 8, 80, 20, 'FD');
+    
+    pdf.setFontSize(24);
+    const scoreColor = resultsData.totalScore >= 80 ? [0, 128, 0] : 
+                     resultsData.totalScore >= 70 ? [0, 0, 255] :
+                     resultsData.totalScore >= 60 ? [255, 165, 0] :
+                     resultsData.totalScore >= 45 ? [255, 140, 0] : [255, 0, 0];
+    
+    pdf.setTextColor(...scoreColor);
+    pdf.text(`${resultsData.totalScore.toFixed(1)}`, 30, yPosition + 5);
+    
+    pdf.setFontSize(12);
+    pdf.setTextColor(0, 0, 0);
+    pdf.text('/ 100', 70, yPosition + 5);
+
+    yPosition += 30;
+    
+    // Scores por categoria
+    pdf.setFontSize(14);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('PONTUAÇÕES POR CATEGORIA', 20, yPosition);
+    yPosition += 15;
+    
+    Object.entries(resultsData.categoryScores).forEach(([, categoryData]) => {
+      if (yPosition > pageHeight - 30) {
+        pdf.addPage();
+        yPosition = 20;
+      }
+      
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(`${categoryData.title}:`, 20, yPosition);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(`${categoryData.average.toFixed(1)}/5.0`, 100, yPosition);
+      yPosition += 12;
+    });
+    
+    // Footer com informações da empresa
+    pdf.setFontSize(8);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(100, 100, 100);
+    pdf.text('Relatório gerado pelo Sistema de Avaliação de Startups', pageWidth/2, pageHeight - 15, { align: 'center' });
+    pdf.text('Valiant Group - Tecnologia e Inovação', pageWidth/2, pageHeight - 10, { align: 'center' });
+    
+    return pdf.output('blob');
+  };
+
+  const sendEmailAutomatically = async (resultsData) => {
+    try {
+      console.log('Gerando PDF e enviando email automaticamente...');
+      const pdfBlob = await generatePDFBlob(resultsData);
+      
+      await sendQuestionnaireResults(userInfo, pdfBlob, resultsData);
+      console.log('Email enviado automaticamente com sucesso!');
+    } catch (error) {
+      console.error('Erro ao enviar email automaticamente:', error);
+      // Não mostra erro para o usuário, apenas loga para não interromper a experiência
+    }
   };
 
   const getCategoryStatus = (categoryIndex) => {
@@ -360,10 +479,13 @@ export const StartupQuestionnaire = () => {
     setErrors({});
     setIsCompleted(false);
     setResults(null);
+    if (onRestart) {
+      onRestart();
+    }
   };
 
   if (isCompleted && results) {
-    return <ResultsReport results={results} onRestart={resetQuestionnaire} />;
+    return <ResultsReport results={results} userInfo={userInfo} onRestart={resetQuestionnaire} />;
   }
 
   return (
@@ -373,6 +495,14 @@ export const StartupQuestionnaire = () => {
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
           Questionário de Avaliação de Startups
         </h1>
+        {userInfo && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+            <p className="text-blue-800">
+              Olá, <strong>{userInfo.userName}</strong>! Vamos avaliar o potencial da <strong>{userInfo.ideaName}</strong>. 
+              Responda todas as perguntas com sinceridade para obter uma análise completa.
+            </p>
+          </div>
+        )}
         <p className="text-gray-600 mb-4">
           Avalie o potencial da sua startup em múltiplas dimensões para
           identificar viabilidade, escalabilidade e necessidades de

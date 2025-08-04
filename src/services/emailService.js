@@ -272,7 +272,7 @@ Email enviado automaticamente pelo Sistema de Avaliação de Startups da Valiant
     `.trim();
 
     const subject = `Nova Avaliação de Startup: ${userInfo.ideaName} - ${userInfo.userName}`;
-    const mailtoLink = `mailto:roberto.zarzur@valiantgroup.com.br?subject=${encodeURIComponent(
+    const mailtoLink = `mailto:contato@valiantgroup.com.br?subject=${encodeURIComponent(
       subject
     )}&body=${encodeURIComponent(emailBody)}`;
 

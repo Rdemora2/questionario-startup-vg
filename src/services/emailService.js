@@ -1,4 +1,5 @@
 import emailjs from "@emailjs/browser";
+import { techFocusedScoringRanges } from "@/utils/automaticAnalysis";
 
 const EMAILJS_SERVICE_ID = "service_2qb6c6k";
 const EMAILJS_TEMPLATE_ID = "template_bcd9y1m";
@@ -14,6 +15,18 @@ export const sendQuestionnaireResults = async (userInfo, pdfBlob, results) => {
     return new Blob([JSON.stringify(data)]).size / 1024;
   };
 
+  // Função para determinar o range de pontuação
+  const getScoringRange = (score) => {
+    for (const [, range] of Object.entries(techFocusedScoringRanges)) {
+      if (score >= range.min && score <= range.max) {
+        return range;
+      }
+    }
+    return techFocusedScoringRanges.poor; // fallback
+  };
+
+  const scoringRange = getScoringRange(results.totalScore);
+
   // Preparar parâmetros básicos do template (fora do try/catch para acessibilidade)
   const baseTemplateParams = {
     to_email: "contato@valiantgroup.com.br",
@@ -26,6 +39,9 @@ export const sendQuestionnaireResults = async (userInfo, pdfBlob, results) => {
     user_whatsapp: userInfo.whatsapp,
 
     total_score: results.totalScore.toFixed(1),
+    scoring_label: scoringRange.label,
+    scoring_description: scoringRange.description,
+    scoring_color: scoringRange.color,
     completion_date: new Date(results.completionDate).toLocaleDateString(
       "pt-BR",
       {

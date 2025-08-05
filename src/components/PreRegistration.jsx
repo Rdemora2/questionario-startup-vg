@@ -121,6 +121,13 @@ export const PreRegistration = ({ onComplete }) => {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <img 
+              src="/logo_vg.webp" 
+              alt="Valiant Group Logo" 
+              className="h-16 w-auto"
+            />
+          </div>
           <CardTitle className="text-2xl font-bold text-gray-900">
             Vamos nos conhecer melhor!
           </CardTitle>

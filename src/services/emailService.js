@@ -34,9 +34,11 @@ export const sendQuestionnaireResults = async (userInfo, pdfBlob, results) => {
     subject: `Nova Avaliação de Startup: ${userInfo.ideaName} - ${userInfo.userName}`,
 
     idea_name: userInfo.ideaName,
+    idea_description: userInfo.ideaDescription || '',
     user_name: userInfo.userName,
     user_email: userInfo.email,
     user_whatsapp: userInfo.whatsapp,
+    investment_amount: userInfo.investmentAmount || '',
 
     total_score: results.totalScore.toFixed(1),
     scoring_label: scoringRange.label,
@@ -264,9 +266,11 @@ Novo questionário de startup preenchido!
 
 INFORMAÇÕES DO USUÁRIO:
 - Nome da Ideia: ${userInfo.ideaName}
+- Descrição da Ideia: ${userInfo.ideaDescription || 'Não informado'}
 - Nome: ${userInfo.userName}
 - E-mail: ${userInfo.email}
 - WhatsApp: ${userInfo.whatsapp}
+- Investimento Disponível: ${userInfo.investmentAmount || 'Não informado'}
 
 RESULTADOS DA AVALIAÇÃO:
 - Pontuação Total: ${results.totalScore.toFixed(1)}/100

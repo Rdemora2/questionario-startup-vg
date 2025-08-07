@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Tooltip,
   TooltipContent,
@@ -20,6 +21,7 @@ const FormField = ({
   value,
   onChange,
   error,
+  isTextarea = false,
 }) => (
   <div className="space-y-2">
     <div className="flex items-center gap-2">
@@ -37,14 +39,26 @@ const FormField = ({
         </Tooltip>
       </TooltipProvider>
     </div>
-    <Input
-      id={field}
-      type={type}
-      placeholder={placeholder}
-      value={value}
-      onChange={onChange}
-      className={`${error ? "border-red-500 focus:border-red-500" : ""}`}
-    />
+    {isTextarea ? (
+      <Textarea
+        id={field}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        className={`${
+          error ? "border-red-500 focus:border-red-500" : ""
+        } min-h-[100px]`}
+      />
+    ) : (
+      <Input
+        id={field}
+        type={type}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        className={`${error ? "border-red-500 focus:border-red-500" : ""}`}
+      />
+    )}
     {error && (
       <div className="flex items-center gap-2 text-red-600 text-sm">
         <AlertCircle className="h-4 w-4" />
@@ -57,17 +71,36 @@ const FormField = ({
 export const PreRegistration = ({ onComplete }) => {
   const [formData, setFormData] = useState({
     ideaName: "",
+    ideaDescription: "",
     userName: "",
     email: "",
     whatsapp: "",
+    investmentAmount: "",
   });
 
   const [errors, setErrors] = useState({});
 
   const handleInputChange = useCallback((field, value) => {
+    let formattedValue = value;
+
+    if (field === "investmentAmount") {
+      const numbers = value.replace(/\D/g, "");
+      if (numbers) {
+        const formatted = new Intl.NumberFormat("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }).format(parseInt(numbers));
+        formattedValue = formatted;
+      } else {
+        formattedValue = "";
+      }
+    }
+
     setFormData((prev) => ({
       ...prev,
-      [field]: value,
+      [field]: formattedValue,
     }));
 
     setErrors((prev) => {
@@ -85,6 +118,10 @@ export const PreRegistration = ({ onComplete }) => {
 
     if (!formData.ideaName.trim()) {
       newErrors.ideaName = "Nome da ideia é obrigatório";
+    }
+
+    if (!formData.ideaDescription.trim()) {
+      newErrors.ideaDescription = "Descrição da ideia é obrigatória";
     }
 
     if (!formData.userName.trim()) {
@@ -105,6 +142,15 @@ export const PreRegistration = ({ onComplete }) => {
       newErrors.whatsapp = "WhatsApp inválido (use formato: +55 11 99999-9999)";
     }
 
+    if (!formData.investmentAmount.trim()) {
+      newErrors.investmentAmount = "Valor de investimento é obrigatório";
+    } else {
+      const numericValue = formData.investmentAmount.replace(/[^\d]/g, "");
+      if (!numericValue || parseInt(numericValue) < 1000) {
+        newErrors.investmentAmount = "Valor mínimo de R$ 1.000";
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -122,9 +168,9 @@ export const PreRegistration = ({ onComplete }) => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <img 
-              src="/logo_vg.webp" 
-              alt="Valiant Group Logo" 
+            <img
+              src="/logo_vg.webp"
+              alt="Valiant Group Logo"
               className="h-16 w-auto"
             />
           </div>
@@ -147,6 +193,19 @@ export const PreRegistration = ({ onComplete }) => {
               value={formData.ideaName}
               onChange={(e) => handleInputChange("ideaName", e.target.value)}
               error={errors.ideaName}
+            />
+
+            <FormField
+              label="Descrição da ideia"
+              tooltip="Conte-nos mais sobre sua ideia. O que ela resolve? Como funciona?"
+              field="ideaDescription"
+              placeholder="Descreva sua ideia de negócio, o problema que resolve e como pretende solucioná-lo..."
+              value={formData.ideaDescription}
+              onChange={(e) =>
+                handleInputChange("ideaDescription", e.target.value)
+              }
+              error={errors.ideaDescription}
+              isTextarea={true}
             />
 
             <FormField
@@ -179,6 +238,19 @@ export const PreRegistration = ({ onComplete }) => {
               value={formData.whatsapp}
               onChange={(e) => handleInputChange("whatsapp", e.target.value)}
               error={errors.whatsapp}
+            />
+
+            <FormField
+              label="Quanto está disposto a investir?"
+              tooltip="Valor que você tem disponível ou pretende investir na ideia. Isso nos ajuda a entender o estágio e as possibilidades do projeto."
+              field="investmentAmount"
+              type="text"
+              placeholder="Ex: R$ 10.000, R$ 50.000, R$ 100.000..."
+              value={formData.investmentAmount}
+              onChange={(e) =>
+                handleInputChange("investmentAmount", e.target.value)
+              }
+              error={errors.investmentAmount}
             />
 
             <Button
